@@ -14,9 +14,6 @@ kubectl apply -f rolling-update-service.yaml
 kubectl get deployments
 kubectl get pods -o wide
 
-# Check that service is accessible
-minikube service nginx-application-service --url
-
 # Trigger rolling update to new nginx version
 kubectl set image deployment/rolling-app-dep nginx-app=nginx:1.26
 
