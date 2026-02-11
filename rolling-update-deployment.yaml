@@ -1,0 +1,56 @@
+apiVersion: apps/v1 #uses stable apps API group
+kind: Deployment #create Deployment controller
+metadata:
+  name: rolling-app-dep #Deployment's name
+  labels:
+    app: nginx-application
+    env: test
+    version: v1.0.0
+spec:
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  replicas: 3
+  selector: #declares which pods this Deployment manages
+    matchLabels:
+      app: nginx-application
+      env: test
+  template: #The template Deployment uses to create pods
+    metadata:
+      labels:
+        app: nginx-application
+        env: test
+        version: v1.0.0
+    spec:
+      containers: #list of containers in the pod
+      - name: nginx-app
+        image: nginx #container image to run
+        ports:
+        - containerPort: 80 #documents the port the container listens on
+
+        # Probe 1: Check if the process has started yet
+        startupProbe:
+            tcpSocket:
+              port: 80 #attempt TCP connection to port 80
+            initialDelaySeconds: 20
+            periodSeconds: 5 #check every 5 seconds
+
+        # Probe 2: Is this pod ready to receive traffic?
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 2
+          periodSeconds: 5
+          failureThreshold: 3
+        
+        # Probe 3: Is the pod stuck/does it need to be restarted?
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          failureThreshold: 3
