@@ -20,6 +20,9 @@ minikube service nginx-application-service --url
 # Trigger rolling update to new nginx version
 kubectl set image deployment/rolling-app-dep nginx-app=nginx:1.26
 
+# Check rollout status
+kubectl rollout status deployment/rolling-app-dep
+
 # Confirm rollout is complete
 kubectl get pods -o wide
 
@@ -27,4 +30,5 @@ kubectl get pods -o wide
 kubectl rollout undo deployment/rolling-app-dep
 
 # Confirm rollback was successful
-kubectl rollout undo deployment/rolling-app-dep
+kubectl rollout status deployment/rolling-app-dep
+kubectl get pods -o wide
